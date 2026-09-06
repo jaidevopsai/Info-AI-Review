@@ -1,0 +1,43 @@
+name: Framework Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate framework files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate policy YAML
+        shell: bash
+        run: >-
+          ruby -e "require 'yaml'; YAML.load_file('config/review-policy.yml', aliases: true); puts 'Policy YAML parsed.'"
+      - name: Check required files
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(
+            README.md
+            CONTRIBUTING.md
+            docs/REVIEW_FRAMEWORK.md
+            docs/CHECKLISTS.md
+            config/review-policy.yml
+            prompts/dotnet-api-review.md
+            prompts/react-ui-review.md
+            prompts/python-e2e-review.md
+            prompts/cross-stack-review.md
+            scripts/pre-commit.sh
+          )
+          for file in "${files[@]}"; do
+            test -s "$file"
+          done
+      - name: Validate shell hook
+        shell: bash
+        run: bash -n scripts/pre-commit.sh

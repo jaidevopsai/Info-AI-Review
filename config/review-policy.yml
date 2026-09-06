@@ -1,0 +1,57 @@
+version: 1
+name: multi-stack-code-review
+severity_order: [blocker, high, medium, low]
+
+stacks:
+  dotnet:
+    manifests: ['*.sln', '*.slnx', '*.csproj']
+    source_extensions: ['.cs']
+    guidance: docs/REVIEW_FRAMEWORK.md
+    prompt: prompts/dotnet-api-review.md
+    checks:
+      - async-and-cancellation
+      - dependency-injection
+      - ef-core-query-shape
+      - api-contracts
+      - authorization-and-secrets
+      - unit-and-integration-tests
+  react:
+    manifests: ['package.json', 'vite.config.*', 'next.config.*']
+    source_extensions: ['.js', '.jsx', '.ts', '.tsx']
+    guidance: docs/REVIEW_FRAMEWORK.md
+    prompt: prompts/react-ui-review.md
+    checks:
+      - component-boundaries
+      - hooks-and-state
+      - async-and-errors
+      - forms-and-inputs
+      - accessibility
+      - user-facing-tests
+  python:
+    manifests: ['pyproject.toml', 'requirements*.txt', 'pytest.ini']
+    source_extensions: ['.py']
+    guidance: docs/REVIEW_FRAMEWORK.md
+    prompt: prompts/python-e2e-review.md
+    checks:
+      - fixtures-and-isolation
+      - mocking-boundaries
+      - api-contracts
+      - browser-lifecycle
+      - database-cleanup
+      - edge-and-security-cases
+
+cross_stack:
+  guidance: docs/REVIEW_FRAMEWORK.md
+  prompt: prompts/cross-stack-review.md
+  checks:
+    - api-ui-contract-alignment
+    - authentication-consistency
+    - e2e-coverage
+    - payload-and-performance-impact
+
+required_review_output:
+  - severity
+  - file_and_line
+  - impact
+  - fix
+  - tests_and_gaps
